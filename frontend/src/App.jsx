@@ -432,7 +432,7 @@ export default function App() {
 • Elimina publicidad, popups, menús, y distracciones.<br>
 • Muestra solo el contenido principal y oculto.
 
-</p>
+
               </p>
             </div>
           </div>
