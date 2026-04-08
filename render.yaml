@@ -9,9 +9,9 @@ services:
       - key: PYTHON_VERSION
         value: "3.11"
 
-  # Frontend - React Static Site
-  - type: static
-    name: article-reader
+staticSites:
+  # Frontend - React
+  - name: article-reader
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
