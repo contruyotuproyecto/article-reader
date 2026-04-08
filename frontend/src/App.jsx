@@ -426,8 +426,13 @@ export default function App() {
             <div className="info-box">
               <strong>¿Cómo funciona?</strong>
               <p style={{ marginTop: 8 }}>
-                Simplemente pega la URL de cualquier artículo y obtienes una versión limpia y fácil de leer. La herramienta elimina automáticamente toda la publicidad, popups, menús de navegación y otros elementos que distraen, dejando solo el texto principal del artículo. Es como tener el "modo lector" de tu navegador, pero que funciona con más sitios web.
-                Elimina publicidad, popups, sidebars y otros elementos distractores.
+                <p>
+• Pega la URL de un artículo.<br>
+• Obtén una versión limpia y fácil de leer.<br>
+• Elimina publicidad, popups, menús, y distracciones.<br>
+• Muestra solo el contenido principal y oculto.
+
+</p>
               </p>
             </div>
           </div>
