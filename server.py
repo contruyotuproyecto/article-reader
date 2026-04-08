@@ -6,12 +6,16 @@ algoritmo que Firefox Reader View.
 
 import hashlib
 import time
+import os
 from urllib.parse import urlparse
+from pathlib import Path
 
 import httpx
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, HttpUrl
 from readability import Document
 
@@ -38,7 +42,6 @@ def get_cached(url: str):
 def set_cached(url: str, data: dict):
     key = hashlib.md5(url.encode()).hexdigest()
     cache[key] = {"data": data, "time": time.time()}
-    # Limitar tamaño del cache
     if len(cache) > 200:
         oldest = min(cache, key=lambda k: cache[k]["time"])
         del cache[oldest]
@@ -94,7 +97,6 @@ def extract_metadata(html: str) -> dict:
         or meta(prop="article:author")
         or ""
     )
-    # Intentar extraer del HTML si no hay meta
     if not author:
         el = soup.select_one("[class*='author'] a, [class*='author'], [rel='author']")
         if el:
@@ -120,12 +122,10 @@ async def fetch_article(req: FetchRequest):
     if not is_safe_url(url):
         raise HTTPException(400, "URL no permitida (red local bloqueada).")
 
-    # Revisar cache
     cached_data = get_cached(url)
     if cached_data:
         return {**cached_data, "cached": True}
 
-    # Fetch con User-Agent estándar de navegador
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -160,7 +160,6 @@ async def fetch_article(req: FetchRequest):
     if len(raw_html) < 100:
         raise HTTPException(422, "La página no tiene contenido suficiente.")
 
-    # ── Readability: extraer contenido principal ─────────────
     try:
         doc = Document(raw_html, url=url)
         title = doc.short_title() or doc.title() or "Sin título"
@@ -170,25 +169,19 @@ async def fetch_article(req: FetchRequest):
             422, "No se pudo extraer el contenido del artículo."
         )
 
-    # Limpiar el HTML extraído
     soup = BeautifulSoup(content_html, "lxml")
 
-    # Remover scripts/styles residuales
     for tag in soup.find_all(["script", "style", "noscript"]):
         tag.decompose()
 
-    # Hacer imágenes responsivas
     for img in soup.find_all("img"):
         img["loading"] = "lazy"
         if img.get("style"):
             del img["style"]
 
     clean_html = str(soup)
-
-    # Metadata
     meta = extract_metadata(raw_html)
 
-    # Word count & read time
     text_only = soup.get_text(separator=" ", strip=True)
     words = len(text_only.split())
     read_time = max(1, round(words / 238))
@@ -214,12 +207,8 @@ async def fetch_article(req: FetchRequest):
 def health():
     return {"status": "ok", "cached_articles": len(cache)}
 
-# ── Serve frontend in production ─────────────────────────────
-import os
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
+# ── Serve frontend in production ─────────────────────────────
 frontend_dist = Path(__file__).parent / "frontend" / "dist"
 if frontend_dist.exists():
     app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
