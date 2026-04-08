@@ -1,19 +1,9 @@
 services:
-  # Backend - Python FastAPI
   - type: web
-    name: article-reader-api
+    name: article-reader
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build
     startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
-
-staticSites:
-  # Frontend - React
-  - name: article-reader
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://article-reader-api.onrender.com
