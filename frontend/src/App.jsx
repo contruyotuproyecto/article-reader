@@ -426,7 +426,7 @@ export default function App() {
             <div className="info-box">
               <strong>¿Cómo funciona?</strong>
               <p style={{ marginTop: 8 }}>
-                <p>
+               
 • Pega la URL de un artículo.<br>
 • Obtén una versión limpia y fácil de leer.<br>
 • Elimina publicidad, popups, menús, y distracciones.<br>
