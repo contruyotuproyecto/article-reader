@@ -404,7 +404,7 @@ export default function App() {
         {!article && !loading && (
           <div className="fade-in">
             <div className="welcome">
-              <h2>Lee sin distracciones</h2>
+              <h2>Lee sin restricciones</h2>
               <p>Pega la URL de cualquier artículo arriba y presiona Leer</p>
             </div>
 
@@ -428,7 +428,7 @@ export default function App() {
   <p style={{ marginTop: 8 }}>
     • Pega la URL de un artículo.<br />
     • Obtén una versión limpia y fácil de leer.<br />
-    • Elimina publicidad, popups, menús y distracciones.<br />
+    • Elimina publicidad, popups, menús y restricciones.<br />
     • Muestra solo el contenido principal y oculto.
   </p>
 </div>
