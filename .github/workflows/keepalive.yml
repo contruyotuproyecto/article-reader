@@ -1,0 +1,15 @@
+name: Keep Render Alive
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # cada 10 minutos
+  workflow_dispatch:  # permite ejecutarlo manualmente
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Article Reader
+        run: |
+          echo "Pinging server..."
+          curl -f https://article-reader-5lon.onrender.com/api/health || exit 0
+          echo "Server is alive!"
