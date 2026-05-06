@@ -1,15 +1,38 @@
 name: Keep Render Alive
+
 on:
   schedule:
-    - cron: '*/10 * * * *'  # cada 10 minutos
-  workflow_dispatch:  # permite ejecutarlo manualmente
+    - cron: '3,13,23,33,43,53 * * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 2
+
     steps:
-      - name: Ping Article Reader
+      - name: Ping Render health endpoint
         run: |
-          echo "Pinging server..."
-          curl -f https://article-reader-5lon.onrender.com/api/health || exit 0
-          echo "Server is alive!"
+          set -e
+
+          URL="https://article-reader-5lon.onrender.com/api/health"
+
+          echo "Pinging: $URL"
+
+          HTTP_CODE=$(curl -L -sS -o response.txt -w "%{http_code}" \
+            --connect-timeout 10 \
+            --max-time 60 \
+            --retry 2 \
+            --retry-delay 5 \
+            "$URL")
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body:"
+          cat response.txt || true
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "Health check failed"
+            exit 1
+          fi
+
+          echo "Server responded successfully"
